@@ -1,0 +1,122 @@
+CREATE DATABASE Estoque
+USE Estoque
+
+/* Tables creation */
+CREATE TABLE Cliente (
+id int primary key identity,
+nome varchar(50) not null,
+dataNacsim date,
+sexo char
+)
+
+CREATE TABLE TipoEndereco(
+id int primary key identity,
+descricao varchar(50) not null
+)
+
+CREATE TABLE Endereco(
+id int primary key identity,
+idCliente int not null,
+idTipo int not null,
+rua varchar(50),
+bairro varchar(30),
+cep varchar(10),
+numero int,
+complemento varchar(50)
+)
+
+CREATE TABLE Telefone(
+id int primary key identity,
+idCliente int not null,
+telefone varchar(15)
+)
+
+/* Showing the tables */
+SELECT * FROM Cliente
+SELECT * FROM TipoEndereco
+SELECT * FROM Endereco
+SELECT * FROM Telefone
+
+/* Add the fk's to tables */
+ALTER TABLE Endereco 
+ADD CONSTRAINT idCliente foreign key (idTipo) references Cliente(id)
+
+ALTER TABLE Telefone 
+ADD CONSTRAINT fk_idCliente foreign key (idCliente) references Cliente(id)
+
+/* Add the values to tables */
+/* Cliente table */
+INSERT INTO Cliente(nome,dataNacsim,sexo) Values
+('Jorge da Fonseca','2000/03/10','M'),
+('Mario da Silva','1950/10/10 ','M'),
+('Jorge Carraro','1986/07/07','M'),
+('Eduardo Lemos','1999/12/31','M'),
+('Gabriel Teixeira','2002/02/02','M'),
+('Maria Branca','1990/05/18','F'), 
+('Daiane Crevei','1993/06/06','F'),
+('Larissa Alves ','2015/04/12','F'),
+('Katia de Lima','2005/09/09','F'),
+('Joaquina Pereira dos Santos','1910/01/01','F')
+/* Tipo endereco table */
+INSERT INTO TipoEndereco(descricao) VALUES
+('Casa'),
+('Trabalho')
+/* Endereco table */
+INSERT INTO Endereco(idCliente,idTipo,rua,bairro,cep,numero,complemento) VALUES
+(1,1,'Rua das Flores','Centro','85603-495',434,null),
+(1,2,'Rua Tapajós','Mercês','85435124',1234,null),
+(2,1,'Rua dos Pinheiros','Bigorrilho','81746-394',1343,'Ap 453'),
+(2,2,'Visconde de Nacar','Centro','87461-401',2394,'Conj 340'),
+(3,1,'Rua Almirante Tamandaré','Portão','87463-384',394,null),
+(3,2,'Rua Canadá','Fazendinha','86473431',84,null),
+(4,1,'Rua Paraná','Centro','82748-301',1093,null),
+(4,2,'Rua Amoras','Centro','85603495',430,null),
+(5,1,'Rua Rio Claro','Pinheirinho','87463345',230,null),
+(5,2,'Rua Pinheiros','Boa Vista','8473639',434,null),
+(6,1,'Rua Estados Unidos', 'Boa Vista', '87467038',500,'Ap 56'),
+(6,2,'Rua Nova','Cabral','89483934',9484,null),
+(7,1,'Rua Pereira','Centro','83784183',3948,null),
+(7,2,'Rua Pimenta','Capao Raso','84737039',4562,'Ap 62 T5'),
+(8,1,'Rua XV de Novembro','Cabral','8374603',398,null),
+(8,2,'Rua Santos Dumont','Santa Felicidade','85603493',3728,null),
+(9,1,'Rua Ermelino de Leao','Uberaba','85603491',038,'Ap 4'),
+(9,2,'Rua Jararaca', 'Tingui','85303495',8387,null),
+(10,1,'Rua Fernando Gomes', 'Agua Verde','8564349',829,null),
+(10,2,'Rua José','Tingui','85123495',183,'Conj 10')
+/* Telefone table */
+INSERT INTO Telefone(idCliente,telefone) VALUES
+(1,'41 89384-3984'),
+(2,'41 99103-4984'),
+(4,'41 89374-3456'),
+(5,'41 90139-3367'),
+(6,'41 99803-6948'),
+(7,'41 88973-1093'),
+(8,'41 88903-1839'),
+(9,'41 87940-1093'),
+(10,'41 99409-2903')
+
+/* Only masculine sex */
+SELECT * FROM Cliente WHERE sexo = 'M'
+/* Clients that start with D */
+SELECT * FROM Cliente WHERE nome LIKE 'D%'
+/* Clients that has D in name */
+SELECT * FROM Cliente WHERE nome LIKE '%d%'
+/* Clients that born after 2000/01/01 */
+SELECT * FROM Cliente WHERE dataNacsim > '01/01/2000'
+/* Clients with their address */
+SELECT nome,rua,bairro,numero FROM Cliente,Endereco
+/* Clients' address order by Name (using WHERE and using AND) */
+SELECT nome,rua,numero,descricao FROM Cliente,Endereco,TipoEndereco ORDER BY nome
+
+/* Clients that haven't registered address */
+SELECT *,rua,numero FROM Cliente,Endereco WHERE rua = null
+/* Clients that have registered address */
+SELECT nome,rua,numero FROM Cliente,Endereco WHERE rua is not null
+/* Clients with address and phone numbers */
+SELECT nome,rua,numero,telefone FROM Cliente,Endereco,Telefone
+/* Clients with address, "casa" type and phone number */
+SELECT nome,rua,numero,telefone FROM Cliente,Endereco,Telefone,TipoEndereco WHERE descricao = 'casa'
+/* Clients with more than one addrress and "casa" type */
+SELECT rua,numero FROM Endereco WHERE COUNT(rua) > 1
+/* Name and address quantity */
+SELECT nome,COUNT(rua) FROM Cliente,Endereco GROUP BY nome 
